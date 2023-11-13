@@ -28,7 +28,6 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-app.use(express.static(path.resolve('C:\\Users\\aleja\\OneDrive\\Escritorio\\chat-app\\server\\src\\public')));
 
 // Routes
 app.use('/api/user', userRoutes);
