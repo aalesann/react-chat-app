@@ -3,6 +3,7 @@ import { HomePage } from "../pages/HomePage"
 import { AboutPage } from "../pages/AboutPage"
 import { Navbar } from "../components/Navbar"
 import { ChatPage } from "../pages/ChatPage"
+import { BackAndForward } from "../components/BackAndForward"
 
 export const MainRoutes = () => {
   return (
@@ -12,7 +13,7 @@ export const MainRoutes = () => {
     // TODO: Diseñar y desarrollar Dashboard para las rutas privadas
     <>
       <Navbar />
-
+      <BackAndForward />
       <Routes>
         <Route path='/home' element={<HomePage />} />
         <Route path='/about' element={<AboutPage />} />

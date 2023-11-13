@@ -34,7 +34,7 @@ export const ChatPage = () => {
 
   return (
     <div className="container">
-      <h1>Chat</h1>
+      <h1>Chat <span class={`badge text-bg-${online ? 'success' : 'danger'}`}>{ online ? 'Online' : 'Offline' }</span></h1>
 
       <div className="row">
         

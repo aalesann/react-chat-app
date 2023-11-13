@@ -9,7 +9,6 @@ export const SocketProvider = ({ children }) => {
 
     // Se comprueba si el usuario está conectado o no
 
-
     const {
         socket,
         online,
