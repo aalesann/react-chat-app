@@ -3,7 +3,6 @@ import { fetchWithOutAuth } from "../api/authApi";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { useForm } from "../hooks/useForm"
-import { SocketContext } from "../context/SocketProvider";
 
 export const LoginPage = () => {
 
@@ -11,7 +10,6 @@ export const LoginPage = () => {
 
   const { login } = useContext(AuthContext);
 
-  const { conectarSocket } = useContext(SocketContext)
 
   const { values, handleInputChange, reset } = useForm({
     username: 'cerbero',

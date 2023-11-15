@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { ChatContext } from "../context/ChatProvider";
 
 export const ChatForm = () => {
-    const { chatState, dispatch } = useContext(ChatContext);
+    const { chatState } = useContext(ChatContext);
 
 
     const [messages, setMessages] = useState([]);
