@@ -1,17 +1,38 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ChatContext } from "../context/ChatProvider";
 import { AuthContext } from "../context/AuthProvider";
 import { ChatForm } from "./ChatForm";
+import { types } from "../types/types";
+import { SocketContext } from "../context/SocketProvider";
 
 export const ChatListMessage = () => {
 
     const { chatState, dispatch } = useContext(ChatContext);
     const { authState } = useContext(AuthContext);
-
+    const { socket } = useContext(SocketContext);
 
 
     // Esta función podría ser modificada para enviar el mensaje a tu backend o WebSocket
-    
+    useEffect(() => {
+        fetch('http://localhost:5000/api/mensaje')
+        .then( resp => resp.json())
+        .then( data => {
+            dispatch({
+                type: types.CARGAR_MENSAJES,
+                payload: data.mensajes
+            })
+        })
+    }, [])
+
+
+    useEffect(() => {
+        socket?.on('mensaje-personal', mensaje => {
+            dispatch({
+                type: types.NUEVO_MENSAJE,
+                payload: mensaje
+            })
+        })
+    }, [socket])
 
     return (
         <>

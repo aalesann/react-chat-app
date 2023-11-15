@@ -16,8 +16,9 @@ import { env } from './config/config.js';
 
 import userRoutes from './routes/user.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import messageRoutes from './routes/mensaje.routes.js';
 import { validarJWTWebsocket } from './middlewares/validar-jwt.js';
-import { listarUsuarios, usuarioConectado, usuarioDesconectado } from './controllers/sockets.controllers.js';
+import { listarUsuarios, mensajePersonal, usuarioConectado, usuarioDesconectado } from './controllers/sockets.controllers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/mensaje', messageRoutes);
 
 
 // Websocket events
@@ -55,9 +57,20 @@ io.on('connection', async (socket) => {
         return console.log('Cliente no identificado', uid);
     }
 
-    const user = await usuarioConectado(uid);
-    console.log('Nuevo Usuario conectado: ', user.username)
+    await usuarioConectado(uid);
+    
+    // Se une al usuario a una sala de socket.io
+    socket.join(uid);
+    
+    // Agregar el usuario conectado a la lista de usuarios
     io.emit('list-users', await listarUsuarios());
+
+    // Escuchar cuando el cliente envia un mensaje
+    socket.on('mensaje-personal', async (payload) =>{
+        console.log(payload);
+        const msg = await mensajePersonal(payload);
+        io.to(payload.to).emit('mensaje-personal', msg);
+    })
 
     socket.on('new-message', (data) => {
         console.log(data);

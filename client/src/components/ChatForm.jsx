@@ -1,21 +1,31 @@
 import { useContext, useState } from "react";
 import { ChatContext } from "../context/ChatProvider";
+import { SocketContext } from "../context/SocketProvider";
+import { AuthContext } from "../context/AuthProvider";
 
 export const ChatForm = () => {
     const { chatState } = useContext(ChatContext);
+    const { socket } = useContext(SocketContext);
+    const { authState } = useContext(AuthContext);
 
-
-    const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
 
 
     const sendMessage = (message) => {
-        // Aquí iría el código para enviar el mensaje
-        console.log("Mensaje enviado: ", message);
+        
+        // Enviar el mensaje al backend por medio de un WebSocket
+        const payload = {
+            from: authState.user.uid,
+            to: chatState.chatActivo,
+            message: newMessage
+        }
+
+        socket?.emit('mensaje-personal', payload)
     };
 
     // Esta función maneja el envío de mensajes
-    const handleSendMessage = () => {
+    const handleSendMessage = (e) => {
+        e.preventDefault();
         if (newMessage.trim() !== '') {
             sendMessage(newMessage);
             setNewMessage('');
@@ -24,7 +34,9 @@ export const ChatForm = () => {
     return (
         <>
             <div className="card-footer">
-                <form>
+                <form
+                    onSubmit={handleSendMessage}
+                >
                     <input
                         type="text"
                         className="form-control"
@@ -34,9 +46,12 @@ export const ChatForm = () => {
                         disabled={(chatState.chatActivo ? false : true)}
                     />
                     <button
+                        type="submit"
                         className="btn btn-primary mt-2"
                         disabled={(chatState.chatActivo ? false : true)}
-                        onClick={handleSendMessage}>Enviar</button>
+                    >
+                        Enviar
+                    </button>
                 </form>
             </div>
         </>

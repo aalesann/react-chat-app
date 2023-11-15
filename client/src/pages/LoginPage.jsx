@@ -33,8 +33,8 @@ export const LoginPage = () => {
       reset();
       
       // Se obtiene la última ruta visitada
-      const lastPath = localStorage.getItem('lastPath') || '/home';
-      return navigate(lastPath);
+      const lastPath = localStorage.getItem('lastPath');
+      return navigate(lastPath || '/home');
     } else {
       alert('Algo salió mal')
     }
