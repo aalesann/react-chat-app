@@ -18,7 +18,9 @@ export const ChatListMessage = () => {
             <div className="col-md-8">
                 <div className="card">
                     <div className="card-header">
-                        Sala de Chat
+                        <h5>
+                        { chatState.chatActivo && chatState.usuarios.find(user => user.uid === chatState.chatActivo).username}
+                        </h5>
                     </div>
                     <div
                         className="card-body chat-messages"
