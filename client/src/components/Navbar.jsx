@@ -27,9 +27,9 @@ export const Navbar = () => {
         <li className="nav-item">
           <NavLink 
             onClick={() => {
-              logout();
-              localStorage.removeItem('token');
               localStorage.removeItem('user');
+              localStorage.removeItem('token');
+              logout();
             }}
           className="nav-link" href="#">Logout</NavLink>
         </li>

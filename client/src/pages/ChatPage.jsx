@@ -1,93 +1,49 @@
-import { useContext, useEffect, useState } from "react"
-import { AuthContext } from "../context/AuthProvider"
-import { SocketContext } from "../context/SocketProvider";
-import { useForm } from "../hooks/useForm";
+import { useState, useEffect, useContext } from 'react';// Asegúrate de importar los estilos de Bootstrap
+import { SocketContext } from '../context/SocketProvider';
+import { ChatContext } from '../context/ChatProvider';
+import { AuthContext } from '../context/AuthProvider';
+import { types } from '../types/types';
+import { ChatSideBar } from '../components/ChatSideBar';
+import { ChatListMessage } from '../components/ChatListMessage';
 
-// TODO: Diseñar y desarrollar la interfaz de chat
 export const ChatPage = () => {
-
+  const { online, socket } = useContext(SocketContext);
+  const { chatState, dispatch } = useContext(ChatContext);
   const { authState } = useContext(AuthContext);
-  const { socket, online } = useContext(SocketContext);
-  const [listMessage, setListMessage] = useState([]);
 
-  const { values, handleInputChange } = useForm({});
+
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+
+
+  // Esta función podría ser modificada para enviar el mensaje a tu backend o WebSocket
+  const sendMessage = (message) => {
+    // Aquí iría el código para enviar el mensaje
+    console.log("Mensaje enviado: ", message);
+  };
+
+  // Esta función maneja el envío de mensajes
+  const handleSendMessage = () => {
+    if (newMessage.trim() !== '') {
+      sendMessage(newMessage);
+      setNewMessage('');
+    }
+  };
+
 
   useEffect(() => {
-    socket?.on('new-message', (payload) => {
-      setListMessage([...listMessage, ...payload]); 
-    })
-  }, [socket, online]);
-
-
-  console.log(socket)
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    socket?.emit('new-message', {
-      from: authState.user.username,
-      message: values.message
-    })
-
-    // reset()
-  }
-
+    // Código para manejar mensajes entrantes...
+  }, []);
 
   return (
-    <div className="container">
-      <h1>Chat <span class={`badge text-bg-${online ? 'success' : 'danger'}`}>{ online ? 'Online' : 'Offline' }</span></h1>
-
+    <div className="container my-4">
       <div className="row">
-        
-        <div className="col-4">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Usuarios</h5>
-              <ul className="list-group">
-                <li className="list-group-item">{ authState.user.username}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        {/* Lista de Usuarios */}
+        <ChatSideBar />
 
-        <div className="col-8">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Chat</h5>
-
-              <ul className="list-group">
-                {
-                  listMessage.map((message, index) => (
-                    <li className="list-group-item" key={index}>
-                      <span className="badge bg-primary">{message.from}</span>: {message.message}
-                    </li>
-                  ))
-                }
-              </ul>
-            </div>
-            <div className="card-footer">
-              <form 
-                onSubmit={handleSubmit}
-
-              >
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Escribe tu mensaje"
-                  name="message"
-                  value={values.message}
-                  onChange={handleInputChange} 
-                />
-                <button
-                  type="submit"
-                  className="btn btn-sm btn-primary"
-                >
-                  Enviar
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+        <ChatListMessage />
       </div>
     </div>
-  )
-}
+
+  );
+};

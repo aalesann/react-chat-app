@@ -33,7 +33,7 @@ export const signin = async (req, res) => {
 
         const token = await generarJWT(user._id);
 
-
+        
         return res.json({
             user,
             token

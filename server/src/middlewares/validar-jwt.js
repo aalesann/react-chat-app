@@ -4,7 +4,7 @@ import { env } from '../config/config.js';
 export const validarJWT = (req, res, next) => {
 
     // Leer el token
-    const token = req.header('Authorization');
+    const token = req.headers('Authorization');
 
     if (!token) {
         return res.status(401).json({
@@ -32,3 +32,19 @@ export const validarJWT = (req, res, next) => {
 
 
 };
+
+
+export const validarJWTWebsocket = (token) => {
+
+    try {
+        const { uid } = jwt.verify(token, env.JWT_ACCESS_SECRET);
+       
+        if(uid) {
+            return [ true, uid ]
+        }
+    } catch (error) {
+        console.log(error);
+        return [ false, null ]
+    }
+
+}

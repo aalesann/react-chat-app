@@ -1,4 +1,7 @@
 export const types = {
     LOGIN: 'LOGIN',
     LOGOUT: 'LOGOUT',
+
+    LISTAR_USUARIOS: 'LISTAR_USUARIOS',
+    CHAT_ACTIVO: 'CHAT_ACTIVO'
 }

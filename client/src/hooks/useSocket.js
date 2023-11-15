@@ -10,10 +10,16 @@ export const useSocket = ( serverPath ) => {
     const [ online, setOnline ] = useState(false);
 
     const conectarSocket = useCallback(() => {
+
+        const token = JSON.parse(localStorage.getItem('token')) || '';
+       
         const socketTemp = io.connect( serverPath, {
             transports: ['websocket'],
             autoConnect: true,
-            forceNew: true
+            forceNew: true,
+            query: {
+                'authorization': token,
+            },
         } );
 
         setSocket( socketTemp );

@@ -30,14 +30,13 @@ export const LoginPage = () => {
       // Persistencia
       localStorage.setItem('user', JSON.stringify(resp.user));
       localStorage.setItem('token', JSON.stringify(resp.token));
-      
-      conectarSocket();
 
       alert('Bienvenid@!!!');
       reset();
       
-
-      return navigate('/');
+      // Se obtiene la última ruta visitada
+      const lastPath = localStorage.getItem('lastPath') || '/home';
+      return navigate(lastPath);
     } else {
       alert('Algo salió mal')
     }

@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthProvider";
 import { useContext } from "react";
 
 export const InactiveUser = () => {
-    const inactive = useInactivityTime(600000); // 60 seconds
+    const inactive = useInactivityTime(300000); // 60 seconds
     const { logout } = useContext(AuthContext);
 
     if (inactive) {

@@ -1,22 +1,33 @@
-import express from 'express';
-import morgan from 'morgan';
 import cors from 'cors';
+import express from 'express';
 import mongoose from 'mongoose';
+import morgan from 'morgan';
+import path from 'path';
+
+
 import { Server as SocketServer } from 'socket.io';
 import { createServer } from 'http';
+import { fileURLToPath } from 'url';
+
 import 'dotenv/config';
 
+// Variables de entorno
 import { env } from './config/config.js';
 
 import userRoutes from './routes/user.routes.js';
 import authRoutes from './routes/auth.routes.js';
-import path from 'path';
+import { validarJWTWebsocket } from './middlewares/validar-jwt.js';
+import { listarUsuarios, usuarioConectado, usuarioDesconectado } from './controllers/sockets.controllers.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 const app = express();
 const httpServer = createServer(app);
 const io = new SocketServer(httpServer);
 
-mongoose.connect('mongodb://localhost:27017/ecommercedb')
+mongoose.connect(env.URI)
 .then(() => console.log('Base de datos online'))
 .catch((error) => {
     console.log(error);
@@ -27,7 +38,7 @@ mongoose.connect('mongodb://localhost:27017/ecommercedb')
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/user', userRoutes);
@@ -35,18 +46,28 @@ app.use('/api/auth', authRoutes);
 
 
 // Websocket events
-io.on('connection', (socket) => {
-    console.log('Cliente conectado', socket.id);
+io.on('connection', async (socket) => {
+    const [isValid, uid ] = validarJWTWebsocket(socket.handshake.query['authorization']);
 
-    socket.emit('message', 'Bienvenido al chat');
+
+    if(!isValid){
+        socket.disconnect();
+        return console.log('Cliente no identificado', uid);
+    }
+
+    const user = await usuarioConectado(uid);
+    console.log('Nuevo Usuario conectado: ', user.username)
+    io.emit('list-users', await listarUsuarios());
 
     socket.on('new-message', (data) => {
         console.log(data);
         io.emit('new-message', data);
     });
 
-    socket.on('disconnect', () => {
-        console.log('Cliente desconectado', socket.id);
+    socket.on('disconnect', async () => {
+        const user = await usuarioDesconectado(uid);
+        io.emit('list-users', await listarUsuarios());
+        console.log('Usuario desconectado:', user.username);
     });
 });
 
