@@ -1,26 +1,17 @@
 import { useContext, useState } from "react";
 import { ChatContext } from "../context/ChatProvider";
+import { AuthContext } from "../context/AuthProvider";
+import { ChatForm } from "./ChatForm";
 
 export const ChatListMessage = () => {
 
     const { chatState, dispatch } = useContext(ChatContext);
+    const { authState } = useContext(AuthContext);
 
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
+
 
     // Esta función podría ser modificada para enviar el mensaje a tu backend o WebSocket
-    const sendMessage = (message) => {
-        // Aquí iría el código para enviar el mensaje
-        console.log("Mensaje enviado: ", message);
-    };
-
-    // Esta función maneja el envío de mensajes
-    const handleSendMessage = () => {
-        if (newMessage.trim() !== '') {
-            sendMessage(newMessage);
-            setNewMessage('');
-        }
-    };
+    
 
     return (
         <>
@@ -34,34 +25,37 @@ export const ChatListMessage = () => {
                         style={{ height: '300px', overflowY: 'auto' }}
                     >
                         {
-                            (chatState.mensajes.length === 0)
+                            (!chatState.chatActivo)
                                 ? (
                                     <div className='mb-2 alert alert-info text-center'>
                                         Seleccione una conversación
                                     </div>
                                 )
                                 : (
-                                    messages.map((msg, index) => (
-                                        <div key={index} className="mb-2">{msg}</div>
+                                    chatState.mensajes
+                                    .filter( msg => 
+                                            msg.from === authState.user.uid && 
+                                            msg.to === chatState.chatActivo ||
+                                            msg.from === chatState.chatActivo &&
+                                            msg.to === authState.uid)
+                                    .map(({ from, to, message }, index) => (
+                                            (from === authState.user.uid)
+                                            ? (
+                                            <div key={index} 
+                                                className="mb-2 alert alert-success">
+                                                { message }
+                                            </div>
+                                            )
+                                            : (
+                                            <div key={index} className="mb-2 alert alert-secondary">
+                                                   { message } 
+                                            </div>
+                                            )
                                     ))
                                 )
                         }
                     </div>
-                    <div className="card-footer">
-                        <form>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Escribe un mensaje..."
-                        />
-                        <button 
-                            className="btn btn-primary mt-2"
-                            disabled={(chatState.chatActivo ? false : true)} 
-                            onClick={handleSendMessage}>Enviar</button>
-                        </form>
-                    </div>
+                    <ChatForm />
                 </div>
             </div>
         </>
